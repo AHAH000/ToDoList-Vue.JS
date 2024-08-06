@@ -17,7 +17,7 @@ const editIndex = ref<number | null>(null);
 // Function to add a new task
 const AddTask = () => {
   if (taskInput.value.trim().length === 0) {
-    alert('Task input cannot be empty');
+    alert('You have to enter a Task ');
     return;
   }
 
