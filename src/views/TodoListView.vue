@@ -76,6 +76,7 @@ const completedTask =(index:number)=>{
 
 
 <template>
+  <br>
   <div class="container text-center">
     <h2 class="mt-5">To Do List</h2>
     <div class="d-flex justify-content-center mb-3">
@@ -127,15 +128,16 @@ const completedTask =(index:number)=>{
   </div>
 </template>
 
-
-
 <style scoped>
-
-/* Center the container */
+/* Container background and text color */
 .container {
-  background-color: #f8f9fa; /* Light gray background */
+  background-color: #000000; /* Black background */
+  color: #ffffff; /* White text color */
   max-width: 800px;
   margin: 0 auto;
+}
+h2{
+  padding-bottom: 20px;
 }
 
 /* Make the Add Task button wider */
@@ -147,39 +149,72 @@ const completedTask =(index:number)=>{
 .task-input {
   flex: 1;
   min-width: 200px; /* Adjust as needed */
+  background-color: #333333; /* Dark gray background */
+  color: #ffffff; /* White text color */
+  border: 1px solid #444444; /* Darker border for better contrast */
 }
 
 /* Make the description input wider and dynamic */
 .description-input {
   flex: 1;
   min-width: 300px; /* Adjust as needed */
+  background-color: #333333; /* Dark gray background */
+  color: #ffffff; /* White text color */
+  border: 1px solid #444444; /* Darker border for better contrast */
 }
 
-/* Ensure dropdown button and menu have consistent width */
-/* Change the dropdown menu background color to green */
+/* Placeholder text color */
+.task-input::placeholder,
+.description-input::placeholder {
+  color: #ffffff; /* White placeholder text */
+}
+
+/* Table styles */
+.table {
+  background-color: #000000; /* Black background for table */
+  color: #ffffff; /* White text color for table */
+}
+
+.table thead {
+  background-color: #000000; /* Black background for table header */
+}
+
+.table th, .table td {
+  border-color: #074713; /* Custom green border color */
+  background-color: #000000; /* Black background for table cells */
+  color: #ffffff; /* White text color for table cells */
+}
+
+.table tbody tr:nth-child(even) {
+  background-color: #111111; /* Slightly lighter black for even rows */
+}
+
+.table tbody tr:hover {
+  background-color: #222222; /* Dark gray highlight on row hover */
+}
+
+/* Dropdown menu and button styles */
 .status-dropdown-menu {
   background-color: #28a745; /* Green background color */
   color: #ffffff; /* White text color */
   border: 1px solid #28a745; /* Match the border color with the background */
 }
 
-/* Change the text color and background of dropdown items */
 .status-dropdown-menu .dropdown-item {
   color: #ffffff; /* White text color */
 }
 
 .status-dropdown-menu .dropdown-item:hover {
-  background-color: #157028; /* Darker green on hover */
+  background-color: #1e7e34; /* Darker green on hover */
 }
 
-/* Optional: Change the background color of the dropdown toggle button */
 .status-dropdown-toggle {
-  background-color: #157028; /* Green background color */
+  background-color: #28a745; /* Green background color */
   color: #ffffff; /* White text color */
 }
 
 .status-dropdown-toggle:hover {
-  background-color: #157028; /* Darker green on hover */
+  background-color: #1e7e34; /* Darker green on hover */
 }
 
 /* Add hover effect to icons */
@@ -189,7 +224,7 @@ const completedTask =(index:number)=>{
 
 .icon-hover:hover {
   transform: translateY(-5px); /* Move icon up by 5px */
-  color: #157028; /* Change color on hover (optional) */
+  color: #28a745; /* Change color on hover */
 }
 
 /* Ensure consistent alignment */
