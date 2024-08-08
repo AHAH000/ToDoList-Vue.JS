@@ -11,7 +11,7 @@ library.add(fasStar, farStar);
 <template>
   <div class="home">
     <h1>Organize your work and life, finally.</h1>
-    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellendus voluptates quasi nemo, maiores debitis deserunt quaerat fuga expedita pariatur ratione cupiditate veniam nam? Laborum dolorum inventore, asperiores minus sit sunt?</p>
+    <p>Our website offers a streamlined and intuitive to-do list management tool designed to help you stay organized and productive. With a user-friendly interface, you can effortlessly create, edit, and delete tasks, categorize them by status, and set deadlines to keep track of your progress. The platform's dynamic features ensure that your to-do list adapts to your needs, whether you're managing personal goals or coordinating team projects. Access your tasks from any device, and experience a seamless blend of functionality and simplicity that makes staying on top of your responsibilities a breeze</p>
     <router-link to="/to-do-list">
       <button class="btn">Start Now</button>
     </router-link>
@@ -86,6 +86,7 @@ body {
   font-size: 1em;
   line-height: 1.5;
   color:whitesmoke;
+  font-family:Arial, Helvetica, sans-serif;
 }
 
 .btn {
@@ -129,11 +130,13 @@ body {
 .reviews h2 {
   margin-bottom: 10px;
   font-size: 2em;
+  font-family: 'Times New Roman', Times, serif;
 }
 
 .reviews p {
   font-size: 1em;
   line-height: 1.5;
+  font-family:Arial, Helvetica, sans-serif;
 }
 
 .reviews span {

@@ -1,87 +1,157 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
+import axios from 'axios';
+import { type ToDoListApi, API_DATA_UPLOAD } from '../api/ToDoListApi';
+import { onBeforeRouteLeave } from 'vue-router';
 
-// Define reactive tasks array
-const tasks = ref([
-  { name: 'Finish the Vue Task',description: 'Make A To Do List using Vue.js' ,status: 'To Do' },
-  { name: 'Task 2', description: '',status: 'To Do' }
-]);
+// Define the API URL directly
+const VITE_API_URL = 'https://todo.nafistech.com/api';
 
-// Define reactive taskInput and editIndex
+// Define reactive task list
+const tasks = ref<ToDoListApi[]>([]);
+
+// Define reactive taskInput, taskDescription, and editIndex
 const taskInput = ref('');
 const taskDescription = ref('');
 const editIndex = ref<number | null>(null);
 
-// Function to add a new task
-const AddTask = () => {
+// Function to fetch tasks from the API
+const ListTasks = async () => {
+  try {
+    const response = await axios.get(`${VITE_API_URL}/tasks`);
+    tasks.value = response.data.map((task: any) => ({
+      ...task,
+      create_date: task.create_date ? new Date(task.create_date) : undefined,
+      update_date: task.update_date ? new Date(task.update_date) : undefined,
+    }));
+  } catch (error) {
+    console.error('Error Listing tasks:', error);
+  }
+};
+
+// Fetch tasks on component mount
+onMounted(() => {
+  ListTasks();
+});
+
+// Handle API data before route leave
+onBeforeRouteLeave((to, from, next) => {
+  if (API_DATA_UPLOAD.DATA_UPLOADED) {
+    API_DATA_UPLOAD.TASK_DATA = tasks.value;
+  }
+  next();
+});
+
+// Function to add or update a task
+const AddTask = async () => {
   if (taskInput.value.trim().length === 0) {
-    alert('You have to enter a Task ');
+    alert('You have to enter a Task Title');
     return;
   }
+  const statuses = ref([
+  { label: 'Pending', value: 'pending' },
+  { label: 'In-Progress', value: 'in_progress' },
+  { label: 'Done', value: 'done' }
+]);
 
-  if (editIndex.value !== null) {
-   // if Task Index Already exits just edit the Task
-    tasks.value[editIndex.value].name = taskInput.value.trim();
-    tasks.value[editIndex.value].description = taskDescription.value.trim() || '';
-    editIndex.value = null; 
-  } else {
-    // Add a new task if index does not exist
-    tasks.value.push({
-      name: taskInput.value.trim(),
-      description: taskDescription.value.trim() || '',
-      status: 'To Do' 
-    });
+
+  // Define the new task object
+  const newTask: ToDoListApi = {
+    title: taskInput.value.trim(),
+    description: taskDescription.value.trim() || '', // Ensure description is optional
+    status: 'in_progress' 
+  };
+
+  try {
+    if (editIndex.value !== null) {
+      // Update existing task using PATCH
+      const updatedTask: ToDoListApi = {
+        ...tasks.value[editIndex.value],
+        ...newTask,
+        id: tasks.value[editIndex.value].id // Keep the same ID
+      };
+      const response = await axios.patch(`${VITE_API_URL}/tasks/${updatedTask.id}`, updatedTask);
+      tasks.value[editIndex.value] = response.data; // Update the task in the list
+      editIndex.value = null; // Reset edit mode
+    } else {
+      // Add new task using POST
+      const response = await axios.post(`${VITE_API_URL}/tasks`, newTask);
+      tasks.value.push(response.data); // Add new task to the list
+    }
+
+    // Clear input fields
+    taskInput.value = '';
+    taskDescription.value = '';
+  } catch (error: any) {
+    // Enhanced error handling
+    if (error.response) {
+      // Server responded with an error
+      console.error('Error adding/updating task:', error.response.data);
+      alert('Error: ' + (error.response.data.message || 'An unknown error occurred'));
+    } else if (error.request) {
+      // No response received
+      console.error('No response received:', error.request);
+      alert('Error: No response from server');
+    } else {
+      // Request setup error
+      console.error('Error setting up request:', error.message);
+      alert('Error: ' + error.message);
+    }
   }
-
-  // Set The Text Input Back Again 
-  taskInput.value = '';
-   taskDescription.value = '';
 };
 
 // Function to delete a task with confirmation
-const deleteTask = (index: number) => {
+const deleteTask = async (index: number) => {
   const task = tasks.value[index];
   
-  if (task.status === 'Completed') {
+  if (task.status === 'done') {
     // Celebrate and then delete if the task is completed
     alert('Congratulations on finishing the task!');
     tasks.value.splice(index, 1);
   } else {
     // Confirm deletion if the task is not completed
     if (confirm('Are you sure you want to delete this task?')) {
-      tasks.value.splice(index, 1);
+      try {
+        await axios.delete(`${VITE_API_URL}/tasks/${task.id}`);
+        tasks.value.splice(index, 1);
+      } catch (error) {
+        console.error('Error deleting task:', error);
+      }
     }
   }
- 
 };
 
 // Function to start editing a task
 const startEditing = (index: number) => {
-  taskInput.value = tasks.value[index].name;
+  taskInput.value = tasks.value[index].title;
   taskDescription.value = tasks.value[index].description;
   editIndex.value = index;
 };
 
-// Function to Celebrate the user finishing the task then removing it 
-const completedTask =(index:number)=>{
-  if(tasks.value[index].status=="Completed"){
-    //alert('Congratulations on finishing the task!');
-    deleteTask(index);
+// Function to update task status
+const updateTaskStatus = async (index: number, status: string) => {
+  try {
+    const updatedTask: ToDoListApi = {
+      ...tasks.value[index],
+      status,
+    };
+    const response = await axios.patch(`${VITE_API_URL}/tasks/${updatedTask.id}`, updatedTask);
+    tasks.value[index] = response.data; // Update the task in the list
+  } catch (error) {
+    console.error('Error updating task status:', error);
+    alert('Error: Could not update task status');
   }
-}
-
+};
 </script>
 
-
 <template>
-  <br>
   <div class="container text-center">
     <h2 class="mt-5">To Do List</h2>
     <div class="d-flex justify-content-center mb-3">
-      <input v-model="taskInput" type="text" placeholder="Enter Task Name" class="form-control me-2 task-input">
-      <input v-model="taskDescription" type="text" placeholder="Enter Description (optional)" class="form-control me-2 description-input">
+      <input v-model="taskInput" type="text" placeholder="Enter Task Title" class="form-control me-2 task-input">
+      <input v-model="taskDescription" type="text" placeholder="Enter Task Description" class="form-control me-2 description-input">
       <button @click="AddTask" class="btn btn-success rounded-0 add-task-btn">
         {{ editIndex !== null ? 'Update Task' : 'Add Task' }}
       </button>
@@ -89,16 +159,19 @@ const completedTask =(index:number)=>{
     <table class="table table-bordered mt-5 w-100">
       <thead>
         <tr>
-          <th scope="col">Task</th>
+          <th scope="col">Title</th>
           <th scope="col">Description</th>
           <th scope="col">Status</th>
-          <th scope="col" class="text-center">#</th>
-          <th scope="col" class="text-center">#</th>
+          <th scope="col" class="text-center">Edit</th>
+          <th scope="col" class="text-center">Delete</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(task, index) in tasks" :key="index">
-          <th scope="row">{{ task.name }}</th>
+        <tr v-for="(task, index) in tasks" :key="task.id">
+          <th scope="row">
+            <span :class="{'finished': task.status === 'done'}">{{ task.title }}</span>
+          </th>
+
           <td>{{ task.description || 'No description' }}</td>
           <td>
             <div class="dropdown">
@@ -106,21 +179,17 @@ const completedTask =(index:number)=>{
                 {{ task.status }}
               </button>
               <ul class="dropdown-menu status-dropdown-menu" :aria-labelledby="'statusDropdown' + index">
-                <li><a class="dropdown-item" href="#" @click="task.status = 'To Do'">To Do</a></li>
-                <li><a class="dropdown-item" href="#" @click="task.status = 'In Progress'">In Progress</a></li>
-                <li><a class="dropdown-item" href="#" @click="task.status = 'Completed'; completedTask(index)">Completed</a></li>
+                <li><a class="dropdown-item" href="#" @click="updateTaskStatus(index, 'pending')">pending</a></li>
+                <li><a class="dropdown-item" href="#" @click="updateTaskStatus(index, 'in_progress')">in_progress</a></li>
+                <li><a class="dropdown-item" href="#" @click="updateTaskStatus(index, 'done'); completedTask(index)">done</a></li>
               </ul>
             </div>
           </td>
-          <td>
-            <div class="text-center">
-              <font-awesome-icon :icon="faPen" @click="startEditing(index)" style="cursor: pointer;" class="icon-hover" />
-            </div>
+          <td class="text-center">
+            <font-awesome-icon :icon="faPen" @click="startEditing(index)" style="cursor: pointer;" class="icon-hover" />
           </td>
-          <td>
-            <div class="text-center">
-              <font-awesome-icon :icon="faTrash" @click="deleteTask(index)" style="cursor: pointer;" class="icon-hover" />
-            </div>
+          <td class="text-center">
+            <font-awesome-icon :icon="faTrash" @click="deleteTask(index)" style="cursor: pointer;" class="icon-hover" />
           </td>
         </tr>
       </tbody>
@@ -136,7 +205,7 @@ const completedTask =(index:number)=>{
   max-width: 800px;
   margin: 0 auto;
 }
-h2{
+h2 {
   padding-bottom: 20px;
 }
 
@@ -230,5 +299,11 @@ h2{
 /* Ensure consistent alignment */
 .table td, .table th {
   vertical-align: middle;
+}
+
+/* Adds text decoration for completed tasks */
+.finished {
+  text-decoration: line-through;
+  text-decoration-thickness: 4px;
 }
 </style>
