@@ -19,7 +19,6 @@ const route = useRoute();
         </li>
       </ul>
     </nav>
- 
     <RouterView/>
 
   </div>
@@ -33,11 +32,11 @@ const route = useRoute();
   justify-content: center;
   min-height: 100vh;
   text-align: center;
+  
 }
 
 nav {
   background-color: black;
-  padding: 1em;
   width: 100vw; /* Full viewport width */
   position: fixed; /* Fix the position at the top */
   top: 0;

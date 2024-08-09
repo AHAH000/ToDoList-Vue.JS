@@ -5,17 +5,19 @@ import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import { type ToDoListApi, API_DATA_UPLOAD } from '../api/ToDoListApi';
 import { onBeforeRouteLeave } from 'vue-router';
+import Notification from '../components/Notification.vue';
 
-// Define the API URL directly
 const VITE_API_URL = 'https://todo.nafistech.com/api';
 
-// Define reactive task list
 const tasks = ref<ToDoListApi[]>([]);
-
-// Define reactive taskInput, taskDescription, and editIndex
 const taskInput = ref('');
 const taskDescription = ref('');
 const editIndex = ref<number | null>(null);
+const showNotification = ref(false);
+const notificationMessage = ref('');
+const showConfirmation = ref(false);
+const confirmationMessage = ref('');
+const onConfirm = ref<(() => void) | null>(null); // Function to call on confirmation
 
 // Function to fetch tasks from the API
 const ListTasks = async () => {
@@ -31,12 +33,10 @@ const ListTasks = async () => {
   }
 };
 
-// Fetch tasks on component mount
 onMounted(() => {
   ListTasks();
 });
 
-// Handle API data before route leave
 onBeforeRouteLeave((to, from, next) => {
   if (API_DATA_UPLOAD.DATA_UPLOADED) {
     API_DATA_UPLOAD.TASK_DATA = tasks.value;
@@ -44,93 +44,103 @@ onBeforeRouteLeave((to, from, next) => {
   next();
 });
 
-// Function to add or update a task
 const AddTask = async () => {
   if (taskInput.value.trim().length === 0) {
-    alert('You have to enter a Task Title');
+    showNotification.value = true;
+    notificationMessage.value = 'You have to enter a Task Title';
     return;
   }
-  const statuses = ref([
-  { label: 'Pending', value: 'pending' },
-  { label: 'In-Progress', value: 'in_progress' },
-  { label: 'Done', value: 'done' }
-]);
 
-
-  // Define the new task object
   const newTask: ToDoListApi = {
     title: taskInput.value.trim(),
-    description: taskDescription.value.trim() || '', // Ensure description is optional
-    status: 'in_progress' 
+    description: taskDescription.value.trim() || '',
+    status: 'in_progress'
   };
 
   try {
     if (editIndex.value !== null) {
-      // Update existing task using PATCH
       const updatedTask: ToDoListApi = {
         ...tasks.value[editIndex.value],
         ...newTask,
-        id: tasks.value[editIndex.value].id // Keep the same ID
+        id: tasks.value[editIndex.value].id
       };
       const response = await axios.patch(`${VITE_API_URL}/tasks/${updatedTask.id}`, updatedTask);
-      tasks.value[editIndex.value] = response.data; // Update the task in the list
-      editIndex.value = null; // Reset edit mode
+      tasks.value[editIndex.value] = response.data;
+      editIndex.value = null;
     } else {
-      // Add new task using POST
       const response = await axios.post(`${VITE_API_URL}/tasks`, newTask);
-      tasks.value.push(response.data); // Add new task to the list
+      tasks.value.push(response.data);
     }
 
-    // Clear input fields
     taskInput.value = '';
     taskDescription.value = '';
+    showNotification.value = true;
+    notificationMessage.value = editIndex.value !== null ? 'Task updated successfully' : 'Task added successfully';
+    editIndex.value = null;
   } catch (error: any) {
-    // Enhanced error handling
     if (error.response) {
-      // Server responded with an error
       console.error('Error adding/updating task:', error.response.data);
-      alert('Error: ' + (error.response.data.message || 'An unknown error occurred'));
+      showNotification.value = true;
+      notificationMessage.value = 'Error: ' + (error.response.data.message || 'An unknown error occurred');
     } else if (error.request) {
-      // No response received
       console.error('No response received:', error.request);
-      alert('Error: No response from server');
+      showNotification.value = true;
+      notificationMessage.value = 'Error: No response from server';
     } else {
-      // Request setup error
       console.error('Error setting up request:', error.message);
-      alert('Error: ' + error.message);
+      showNotification.value = true;
+      notificationMessage.value = 'Error: ' + error.message;
     }
   }
 };
 
+// Function to show the confirmation dialog
+const showConfirmDialog = (message: string, onConfirmCallback: () => void) => {
+  confirmationMessage.value = message;
+  showConfirmation.value = true;
+  onConfirm.value = onConfirmCallback;
+};
+
+// Function to handle the confirmation response
+const handleConfirmation = (confirmed: boolean) => {
+  if (confirmed && onConfirm.value) {
+    onConfirm.value();
+  }
+  showConfirmation.value = false;
+};
+
 // Function to delete a task with confirmation
-const deleteTask = async (index: number) => {
+const deleteTask = (index: number) => {
   const task = tasks.value[index];
-  
+
   if (task.status === 'done') {
-    // Celebrate and then delete if the task is completed
-    alert('Congratulations on finishing the task!');
+    showNotification.value = true;
+    notificationMessage.value = 'Congratulations on finishing the task!';
     tasks.value.splice(index, 1);
-  } else {
-    // Confirm deletion if the task is not completed
-    if (confirm('Are you sure you want to delete this task?')) {
+    return; // Exit function early to avoid unnecessary API call
+  }
+
+  showConfirmDialog(
+    `Are you sure you want to delete the task titled "${task.title}"?`,
+    async () => {
       try {
         await axios.delete(`${VITE_API_URL}/tasks/${task.id}`);
         tasks.value.splice(index, 1);
       } catch (error) {
         console.error('Error deleting task:', error);
+        showNotification.value = true;
+        notificationMessage.value = 'Error: Could not delete task';
       }
     }
-  }
+  );
 };
 
-// Function to start editing a task
 const startEditing = (index: number) => {
   taskInput.value = tasks.value[index].title;
   taskDescription.value = tasks.value[index].description;
   editIndex.value = index;
 };
 
-// Function to update task status
 const updateTaskStatus = async (index: number, status: string) => {
   try {
     const updatedTask: ToDoListApi = {
@@ -138,16 +148,23 @@ const updateTaskStatus = async (index: number, status: string) => {
       status,
     };
     const response = await axios.patch(`${VITE_API_URL}/tasks/${updatedTask.id}`, updatedTask);
-    tasks.value[index] = response.data; // Update the task in the list
+    tasks.value[index] = response.data;
   } catch (error) {
     console.error('Error updating task status:', error);
-    alert('Error: Could not update task status');
+    showNotification.value = true;
+    notificationMessage.value = 'Error: Could not update task status';
   }
 };
 </script>
 
 <template>
   <div class="container text-center">
+    <!-- Notification Component for General Messages -->
+    <Notification v-if="showNotification" :message="notificationMessage" @close="showNotification = false" />
+    
+    <!-- Notification Component for Confirmation -->
+    <Notification v-if="showConfirmation" :message="confirmationMessage" :hasConfirm="true" @confirm="handleConfirmation(true)" @cancel="handleConfirmation(false)" />
+    
     <h2 class="mt-5">To Do List</h2>
     <div class="d-flex justify-content-center mb-3">
       <input v-model="taskInput" type="text" placeholder="Enter Task Title" class="form-control me-2 task-input">
@@ -196,6 +213,8 @@ const updateTaskStatus = async (index: number, status: string) => {
     </table>
   </div>
 </template>
+
+
 
 <style scoped>
 /* Container background and text color */

@@ -19,7 +19,7 @@ library.add(fasStar, farStar);
   <div class="separator"></div> <!-- Separator between Home and Content -->
   <div class="content">
     <div class="img">
-      <img src="../assets/images/ToDoListImgHR.png" alt="">
+      <img src="../assets/images/ToDoListImgUD.png" alt="">
     </div>
     <div class="reviews">
       <h2>Reviews</h2>
@@ -69,7 +69,7 @@ body {
 
 .home {
   color: green;
-  padding: 20px;
+  padding: 5rem;
   border-radius: 8px;
   text-align: center;
 }
@@ -106,19 +106,16 @@ body {
   border-radius: 15px;
 }
 
-.separator {
-  height: 40px; /* Adjust as needed */
-}
+
 
 .content {
   display: flex;
   align-items: center;
-  gap: 30px; /* Increased space between image and reviews */
+  gap: 20px; /* Increased space between image and reviews */
 }
 
 .img img {
-  
-  width: 525px; /* Increased size */
+  width: 655px; /* Increased size */
 }
 
 .reviews {
