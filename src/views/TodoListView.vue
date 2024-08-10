@@ -19,7 +19,7 @@ const showConfirmation = ref(false);
 const confirmationMessage = ref('');
 const onConfirm = ref<(() => void) | null>(null); // Function to call on confirmation
 
-// Function to fetch tasks from the API
+// Function to List tasks from the API
 const ListTasks = async () => {
   try {
     const response = await axios.get(`${VITE_API_URL}/tasks`);
@@ -43,6 +43,8 @@ onBeforeRouteLeave((to, from, next) => {
   }
   next();
 });
+
+//To Add new Task
 
 const AddTask = async () => {
   if (taskInput.value.trim().length === 0) {
@@ -116,8 +118,10 @@ const deleteTask = (index: number) => {
   if (task.status === 'done') {
     showNotification.value = true;
     notificationMessage.value = 'Congratulations on finishing the task!';
+     axios.delete(`${VITE_API_URL}/tasks/${task.id}`);
+
     tasks.value.splice(index, 1);
-    return; // Exit function early to avoid unnecessary API call
+    return; 
   }
 
   showConfirmDialog(
