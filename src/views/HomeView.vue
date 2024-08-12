@@ -95,10 +95,11 @@ body {
   border: none;
   padding: 10px 20px;
   font-size: 1em;
-  border-radius: 5px;
+  border-radius: 34px;
   cursor: pointer;
   text-decoration: none; /* Remove underline for router-link */
   display: inline-block; /* Ensure button behaves correctly */
+  margin-top: 10px;
 }
 
 .btn:hover {

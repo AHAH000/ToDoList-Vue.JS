@@ -32,6 +32,7 @@
     top: 0;
     left: 0;
     box-sizing: border-box;
+    margin-bottom: 20px;
   }
   
   ul {

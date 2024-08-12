@@ -141,7 +141,7 @@ const deleteTask = (index: number) => {
 
 const startEditing = (index: number) => {
   taskInput.value = tasks.value[index].title;
-  taskDescription.value = tasks.value[index].description;
+  taskDescription.value = tasks.value[index].description as string;
   editIndex.value = index;
 };
 
@@ -202,7 +202,7 @@ const updateTaskStatus = async (index: number, status: string) => {
               <ul class="dropdown-menu status-dropdown-menu" :aria-labelledby="'statusDropdown' + index">
                 <li><a class="dropdown-item" href="#" @click="updateTaskStatus(index, 'pending')">pending</a></li>
                 <li><a class="dropdown-item" href="#" @click="updateTaskStatus(index, 'in_progress')">in_progress</a></li>
-                <li><a class="dropdown-item" href="#" @click="updateTaskStatus(index, 'done'); completedTask(index)">done</a></li>
+                <li><a class="dropdown-item" href="#" @click="updateTaskStatus(index, 'done');">done</a></li>
               </ul>
             </div>
           </td>
