@@ -1,6 +1,6 @@
 <!-- src/components/NavBar.vue -->
 <template>
-      <nav>
+      <nav >
         <ul>
           <li :class="{ active: route.path === '/' }">
             <router-link to="/">Home</router-link>
@@ -11,6 +11,9 @@
           <li :class="{ active: route.path === '/to-do-list' }">
             <router-link to="/to-do-list">To Do List</router-link>
           </li>
+          <li :class="{ active: route.path === '/RegisterView' }">
+            <router-link to="/RegisterView">Register</router-link>
+          </li>
         </ul>
       </nav>
   
@@ -18,8 +21,12 @@
   
   <script setup lang="ts">
   import { useRoute } from 'vue-router';
-  
+  import { ref } from 'vue';
   const route = useRoute();
+  // const isAuthenticated = ref(false)
+  // const props= defineProps<(
+  // showMessage :boolean
+  // )>()
   </script>
   
   <style scoped>
@@ -28,11 +35,10 @@
   nav {
     background-color: black;
     width: 100vw; /* Full viewport width */
-    position: fixed; /* Fix the position at the top */
     top: 0;
     left: 0;
+    position: fixed;
     box-sizing: border-box;
-    margin-bottom: 20px;
   }
   
   ul {

@@ -1,4 +1,11 @@
+<script setup lang="ts">
+
+
+</script>
+
+
 <template>
+
   <div class="about">
     <h1>This is an about page</h1>
     <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. At dolorum exercitationem ex odit sunt culpa voluptatum architecto a, quasi aspernatur quo, enim eum possimus ipsam atque eaque itaque? In, quasi!</p>
@@ -6,6 +13,11 @@
 </template>
 
 <style scoped>
+.about {
+  background-color: #121212; /* Set a background color, adjust as needed */
+  color: white; /* Ensure text color is white if desired */
+  padding: 2em; /* Add padding to give space around the content */
+}
 .about h1{
   color: white;
   font-family: 'Times New Roman', Times, serif;

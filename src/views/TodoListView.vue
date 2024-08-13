@@ -8,6 +8,7 @@ import { onBeforeRouteLeave } from 'vue-router';
 import Notification from '../components/Notification.vue';
 
 const VITE_API_URL = 'https://todo.nafistech.com/api';
+//axios.default.headers.commom['Authorization'] =`Bearer $(token)`
 
 const tasks = ref<ToDoListApi[]>([]);
 const taskInput = ref('');
@@ -20,6 +21,10 @@ const confirmationMessage = ref('');
 const onConfirm = ref<(() => void) | null>(null); // Function to call on confirmation
 
 // Function to List tasks from the API
+onMounted(() => {
+  //Added to check if user is Authenticated or not if not then Makes him Authenticate first
+  ListTasks(); 
+});
 const ListTasks = async () => {
   try {
     const response = await axios.get(`${VITE_API_URL}/tasks`);
@@ -33,9 +38,7 @@ const ListTasks = async () => {
   }
 };
 
-onMounted(() => {
-  ListTasks();
-});
+
 
 onBeforeRouteLeave((to, from, next) => {
   if (API_DATA_UPLOAD.DATA_UPLOADED) {
@@ -162,6 +165,7 @@ const updateTaskStatus = async (index: number, status: string) => {
 </script>
 
 <template>
+
   <div class="container text-center">
     <!-- Notification Component for General Messages -->
     <Notification v-if="showNotification" :message="notificationMessage" @close="showNotification = false" />
@@ -222,6 +226,7 @@ const updateTaskStatus = async (index: number, status: string) => {
 
 <style scoped>
 /* Container background and text color */
+
 .container {
   background-color: #000000; /* Black background */
   color: #ffffff; /* White text color */

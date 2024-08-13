@@ -3,18 +3,22 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faStar as fasStar } from '@fortawesome/free-solid-svg-icons';
 import { faStar as farStar } from '@fortawesome/free-regular-svg-icons';
-
+import ListTasks from '@/components/ListTasks.vue';
 // Add the icons to the library
 library.add(fasStar, farStar);
 </script>
 
 <template>
+
   <div class="home">
     <h1>Organize your work and life, finally.</h1>
     <p>Our website offers a streamlined and intuitive to-do list management tool designed to help you stay organized and productive. With a user-friendly interface, you can effortlessly create, edit, and delete tasks, categorize them by status, and set deadlines to keep track of your progress. The platform's dynamic features ensure that your to-do list adapts to your needs, whether you're managing personal goals or coordinating team projects. Access your tasks from any device, and experience a seamless blend of functionality and simplicity that makes staying on top of your responsibilities a breeze</p>
     <router-link to="/to-do-list">
       <button class="btn">Start Now</button>
     </router-link>
+  </div>
+  <div class="ListTasks">
+    <ListTasks></ListTasks>
   </div>
   <div class="separator"></div> <!-- Separator between Home and Content -->
   <div class="content">
@@ -139,5 +143,10 @@ body {
 
 .reviews span {
   margin-left: 10px;
+}
+.ListTasks{
+  margin-bottom: 50px;
+  width: 100%;
+  height: 100%;
 }
 </style>
