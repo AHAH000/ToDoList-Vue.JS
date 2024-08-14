@@ -4,7 +4,16 @@ export interface ToDoListApi {
     description?: string; // Optional
     status: string; // Change to TaskStatus enum
   }
-  
+  export interface Register{
+    email:string;
+    name:string;
+    password:string;
+    password_confirmation:string;
+  }
+  export interface Login{
+    email:string;
+    password:string;
+  }
   // Define TaskStatus enum
  
   export const API_DATA_UPLOAD = {

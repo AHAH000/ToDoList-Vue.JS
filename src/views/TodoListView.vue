@@ -6,10 +6,8 @@ import axios from 'axios';
 import { type ToDoListApi, API_DATA_UPLOAD } from '../api/ToDoListApi';
 import { onBeforeRouteLeave } from 'vue-router';
 import Notification from '../components/Notification.vue';
-
 const VITE_API_URL = 'https://todo.nafistech.com/api';
 //axios.default.headers.commom['Authorization'] =`Bearer $(token)`
-
 const tasks = ref<ToDoListApi[]>([]);
 const taskInput = ref('');
 const taskDescription = ref('');
@@ -20,8 +18,10 @@ const showConfirmation = ref(false);
 const confirmationMessage = ref('');
 const onConfirm = ref<(() => void) | null>(null); // Function to call on confirmation
 
+
 // Function to List tasks from the API
 onMounted(() => {
+  
   //Added to check if user is Authenticated or not if not then Makes him Authenticate first
   ListTasks(); 
 });

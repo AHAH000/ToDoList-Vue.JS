@@ -2,19 +2,21 @@
 import { ref } from 'vue';
 import axios from 'axios';
 import Notification from '@/components/Notification.vue';
+import type { Login } from '@/api/ToDoListApi';
+import { useRouter } from 'vue-router';
+import router from '@/router';
+import HomeView from './HomeView.vue';
 const VITE_API_URL = 'https://todo.nafistech.com/api';
-import { type ToDoListApi, API_DATA_UPLOAD } from '../api/ToDoListApi';
+
 const emailInput = ref('');
 const passwordInput = ref('');
 const notificationMessage = ref('');
 const showNotification = ref(false);
-const token = localStorage.getItem('token');
-    // axios.default.headers.commom['Authorization'] =`Bearer $(token)`
+
 const validateEmail = (email: string): boolean => {
-  // Basic email format validation using regex
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
-}
+};
 
 const submitLoginForm = async (event: Event) => {
   event.preventDefault(); // Prevent form from submitting normally
@@ -31,65 +33,72 @@ const submitLoginForm = async (event: Event) => {
     return;
   }
 
-  try {
-    const response = await axios.post(`${VITE_API_URL}/login`, {
-      email: emailInput.value,
-      password: passwordInput.value,
-    });
+  const user: Login = {
+    email: emailInput.value,
+    password: passwordInput.value,
+  };
 
-    // Handle successful login (e.g., store token, redirect)
-    console.log('Login successful:', response.data);
+  try {
+    const response = await axios.post(`${VITE_API_URL}/login`, user);
+    const token = response.data.token;
+
+    if (token) {
+      localStorage.setItem('token', token);
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      showNotification.value = true;
+      notificationMessage.value = 'Login successful!';
+      router.push('/')
+    } else {
+      showNotification.value = true;
+      notificationMessage.value = 'Login failed. No token received.';
+    }
   } catch (error) {
-    // Handle error (e.g., show error message)
-    notificationMessage.value = 'Login failed. Please check your credentials.';
     showNotification.value = true;
+    notificationMessage.value = `Login failed: ${error}`;
   }
-}
+};
 </script>
 
-
 <template>
-    <Notification v-if="showNotification" :message="notificationMessage" @close="showNotification = false" />
-  
-    <div class="container">
-      <div class="center">
-        <h1>Login</h1>
-        <form @submit="submitLoginForm">
-          <div class="txt_field">
-            <input type="email" v-model="emailInput" />
-            <span></span>
-            <label>Email</label>
-          </div>
-          <div class="txt_field">
-            <input type="password" v-model="passwordInput"/>
-            <span></span>
-            <label>Password</label>
-          </div>
-          <button type="submit" class="LogBtn">Login In</button>
-          <div class="RouteRegister">
-            Don’t have an account <router-link to="/RegisterView">Register here</router-link>
-          </div>
-        </form>
-      </div>
-  
-      <div class="sideInfo">
-        <img src="../assets/images/ToDoListImgUD.png" alt="To-Do List Benefits" class="sideInfo-image" />
-        <div class="benefits-list">
-          <h2> Why To-Do-List</h2>
-          <ul>
-            <li>Organize tasks efficiently</li>
-            <li>Track your progress</li>
-            <li>Stay on top of deadlines</li>
-            <li>Boost productivity</li>
-          </ul>
+  <Notification v-if="showNotification" :message="notificationMessage" @close="showNotification = false" />
+
+  <div class="container">
+    <div class="center">
+      <h1>Login</h1>
+      <form @submit="submitLoginForm">
+        <div class="txt_field">
+          <input type="email" v-model="emailInput" />
+          <span></span>
+          <label>Email</label>
         </div>
+        <div class="txt_field">
+          <input type="password" v-model="passwordInput" />
+          <span></span>
+          <label>Password</label>
+        </div>
+        <button type="submit" class="LogBtn">Login</button>
+        <div class="RouteRegister">
+          Don’t have an account <router-link to="/RegisterView">Register here</router-link>
+        </div>
+      </form>
+    </div>
+
+    <div class="sideInfo">
+      <img src="../assets/images/ToDoListImgUD.png" alt="To-Do List Benefits" class="sideInfo-image" />
+      <div class="benefits-list">
+        <h2>Why To-Do-List</h2>
+        <ul>
+          <li>Organize tasks efficiently</li>
+          <li>Track your progress</li>
+          <li>Stay on top of deadlines</li>
+          <li>Boost productivity</li>
+        </ul>
       </div>
     </div>
-  </template>
-  
-  
+  </div>
+</template>
 
-  <style scoped>
+<style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans:wght@700&family=Poppins:wght@400;500;600&display=swap");
 
 * {
@@ -100,7 +109,7 @@ const submitLoginForm = async (event: Event) => {
 }
 
 body {
-  background: black; /* Set body background to black */
+  background: black;
   height: 100vh;
 }
 
@@ -113,10 +122,10 @@ body {
 }
 
 .center {
-  background: black; /* Set form background to black */
-  border-radius: 10px; /* Rounded corners for the form container */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(0, 0, 0, 0.7); /* Outer and inner shadow for depth */
-  border: 3px solid rgba(255, 255, 255, 0.3); /* Light border with some opacity */
+  background: black;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(0, 0, 0, 0.7);
+  border: 3px solid rgba(255, 255, 255, 0.3);
   padding: 20px;
   max-width: 600px;
   width: 100%;
@@ -125,37 +134,36 @@ body {
 .center h1 {
   text-align: center;
   padding: 20px 0;
-  border-bottom: 1px solid white; /* Change border color to white */
-  color: white; /* Set text color to white */
+  border-bottom: 1px solid white;
+  color: white;
 }
 
 .center form {
   padding: 0 40px;
-  box-sizing: border-box;
 }
 
 form .txt_field {
   position: relative;
-  border-bottom: 2px solid white; /* Change input underline color to white */
+  border-bottom: 2px solid white;
   margin: 30px 0;
 }
 
 .txt_field input {
   width: 100%;
-  padding: 10px 5px; /* Added padding to input field */
+  padding: 10px 5px;
   height: 40px;
   font-size: 16px;
   border: none;
   background: none;
-  color: white; /* Set input text color to white */
+  color: white;
   outline: none;
 }
 
 .txt_field label {
   position: absolute;
-  top: 10px; /* Added space between label and input field */
+  top: 10px;
   left: 5px;
-  color: white; /* Set label text color to white */
+  color: white;
   transform: translateY(-50%);
   font-size: 16px;
   pointer-events: none;
@@ -169,14 +177,14 @@ form .txt_field {
   left: 0;
   width: 0%;
   height: 2px;
-  background: white; /* Change underline color to white */
+  background: white;
   transition: 0.5s;
 }
 
 .txt_field input:focus ~ label,
 .txt_field input:valid ~ label {
   top: -5px;
-  color: white; /* Change focused label color to white */
+  color: white;
 }
 
 .txt_field input:focus ~ span::before,
@@ -184,20 +192,10 @@ form .txt_field {
   width: 100%;
 }
 
-.pass {
-  margin: -5px 0 20px 5px;
-  color: white; /* Change password text color to white */
-  cursor: pointer;
-}
-
-.pass:hover {
-  text-decoration: underline;
-}
-
 .LogBtn {
   width: 100%;
   height: 50px;
-  background: green; /* Set button background to green */
+  background: green;
   border-radius: 25px;
   font-size: 18px;
   font-weight: 700;
@@ -205,33 +203,33 @@ form .txt_field {
   outline: none;
   transition: 0.5s;
   border: none;
-  color: white; /* Set button text color to white */
+  color: white;
 }
 
 .LogBtn:hover {
-  background: darkgreen; /* Darken button background on hover */
+  background: darkgreen;
 }
 
 .RouteRegister {
-  margin-top: 20px; /* Add some space above the text */
+  margin-top: 20px;
   color: white;
   margin-bottom: 50px;
 }
 
 .RouteRegister a {
-  color: green; /* Set the link color to green */
-  text-decoration: none; /* Remove underline from the link */
+  color: green;
+  text-decoration: none;
 }
 
 .RouteRegister a:hover {
-  text-decoration: underline; /* Add underline on hover */
+  text-decoration: underline;
 }
 
 .sideInfo {
-  background: black; /* Set form background to black */
-  border-radius: 50px; /* Rounded corners for the form container */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(0, 0, 0, 0.7); /* Outer and inner shadow for depth */
-  border: 3px solid rgba(255, 255, 255, 0.3); /* Light border with some opacity */
+  background: black;
+  border-radius: 50px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(0, 0, 0, 0.7);
+  border: 3px solid rgba(255, 255, 255, 0.3);
   color: white;
   max-width: 400px;
   width: 100%;
@@ -245,24 +243,24 @@ form .txt_field {
 }
 
 .benefits-list h2 {
-    margin-bottom: 10px;
-    color: white;
-  }
-  
-  .benefits-list ul {
-    list-style-type: disc;
-    padding-left: 20px;
-  }
-  
-  .benefits-list li {
-    margin-bottom: 10px;
-    transition: color 0.3s, background-color 0.3s; /* Smooth transition for hover effects */
-    padding: 5px; /* Add some padding for better spacing */
-    border-radius: 5px; /* Rounded corners for the hover effect */
-  }
-  
-  .benefits-list li:hover {
-    color: green; /* Change text color on hover */
-    background-color: rgba(20, 163, 82, 0.1); /* Light green background on hover */
-  }
+  margin-bottom: 10px;
+  color: white;
+}
+
+.benefits-list ul {
+  list-style-type: disc;
+  padding-left: 20px;
+}
+
+.benefits-list li {
+  margin-bottom: 10px;
+  transition: color 0.3s, background-color 0.3s;
+  padding: 5px;
+  border-radius: 5px;
+}
+
+.benefits-list li:hover {
+  color: green;
+  background-color: rgba(20, 163, 82, 0.1);
+}
 </style>
