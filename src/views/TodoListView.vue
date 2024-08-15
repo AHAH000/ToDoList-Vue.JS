@@ -6,8 +6,11 @@ import axios from 'axios';
 import { type ToDoListApi, API_DATA_UPLOAD } from '../api/ToDoListApi';
 import { onBeforeRouteLeave } from 'vue-router';
 import Notification from '../components/Notification.vue';
+import { isAuthenticated } from '@/auth';
+import router from '@/router';
+
 const VITE_API_URL = 'https://todo.nafistech.com/api';
-//axios.default.headers.commom['Authorization'] =`Bearer $(token)`
+
 const tasks = ref<ToDoListApi[]>([]);
 const taskInput = ref('');
 const taskDescription = ref('');
@@ -18,13 +21,23 @@ const showConfirmation = ref(false);
 const confirmationMessage = ref('');
 const onConfirm = ref<(() => void) | null>(null); // Function to call on confirmation
 
+const showLoginReminder = () => {
+  notificationMessage.value = 'You must log in first';
+  showNotification.value = true;
+  setTimeout(() => {
+    router.push('/LoginForm');
+  }, 2000); // Wait 2 seconds to show the message before redirecting
+};
 
 // Function to List tasks from the API
 onMounted(() => {
-  
-  //Added to check if user is Authenticated or not if not then Makes him Authenticate first
-  ListTasks(); 
+  if (isAuthenticated.value) {
+    ListTasks(); 
+  } else {
+    showLoginReminder();
+  }
 });
+
 const ListTasks = async () => {
   try {
     const response = await axios.get(`${VITE_API_URL}/tasks`);
@@ -38,8 +51,6 @@ const ListTasks = async () => {
   }
 };
 
-
-
 onBeforeRouteLeave((to, from, next) => {
   if (API_DATA_UPLOAD.DATA_UPLOADED) {
     API_DATA_UPLOAD.TASK_DATA = tasks.value;
@@ -47,8 +58,7 @@ onBeforeRouteLeave((to, from, next) => {
   next();
 });
 
-//To Add new Task
-
+// To Add new Task
 const AddTask = async () => {
   if (taskInput.value.trim().length === 0) {
     showNotification.value = true;
@@ -121,8 +131,7 @@ const deleteTask = (index: number) => {
   if (task.status === 'done') {
     showNotification.value = true;
     notificationMessage.value = 'Congratulations on finishing the task!';
-     axios.delete(`${VITE_API_URL}/tasks/${task.id}`);
-
+    axios.delete(`${VITE_API_URL}/tasks/${task.id}`);
     tasks.value.splice(index, 1);
     return; 
   }

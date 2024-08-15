@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { type ToDoListApi } from '../api/ToDoListApi';
 import Notification from '../components/Notification.vue';
-
+import { isAuthenticated } from '@/auth';
 const VITE_API_URL = 'https://todo.nafistech.com/api';
 
 const tasks = ref<ToDoListApi[]>([]);
@@ -27,7 +27,12 @@ const ListTasks = async () => {
 };
 
 onMounted(() => {
-  ListTasks(); 
+    if(isAuthenticated.value){
+        ListTasks(); 
+    }else{
+        showNotification.value=true;
+        notificationMessage.value="Please Login First ";
+    }
 });
 </script>
 

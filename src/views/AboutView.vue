@@ -1,5 +1,18 @@
 <script setup lang="ts">
+import { isAuthenticated } from '@/auth';
+import { ref,onMounted } from 'vue';
+import Notification from '@/components/Notification.vue';
 
+const showNotification = ref(false);
+const notificationMessage = ref('');
+onMounted(() => {
+    if(isAuthenticated.value){
+      
+    }else{
+        showNotification.value=true;
+        notificationMessage.value="Please Login First ";
+    }
+});
 
 </script>
 

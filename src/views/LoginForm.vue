@@ -7,6 +7,9 @@ import { useRouter } from 'vue-router';
 import router from '@/router';
 import HomeView from './HomeView.vue';
 const VITE_API_URL = 'https://todo.nafistech.com/api';
+// const isAuth=ref(false);
+import { isAuthenticated } from '@/auth';
+
 
 const emailInput = ref('');
 const passwordInput = ref('');
@@ -47,14 +50,16 @@ const submitLoginForm = async (event: Event) => {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       showNotification.value = true;
       notificationMessage.value = 'Login successful!';
-      router.push('/')
+      router.push('/');
+    //   isAuth.value=true;
+    isAuthenticated.value = true;
     } else {
       showNotification.value = true;
-      notificationMessage.value = 'Login failed. No token received.';
+      notificationMessage.value = 'Login failed. Check your Credentials';
     }
   } catch (error) {
     showNotification.value = true;
-    notificationMessage.value = `Login failed: ${error}`;
+    notificationMessage.value = `Login failed. Check your Credentials`;
   }
 };
 </script>

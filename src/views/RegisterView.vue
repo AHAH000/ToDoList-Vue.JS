@@ -3,6 +3,7 @@ import { ref, computed } from 'vue';
 import axios from 'axios';
 import Notification from '@/components/Notification.vue';
 import { type Register } from '../api/ToDoListApi';
+import router from '@/router';
 
 // Define the API URL
 const VITE_API_URL = 'https://todo.nafistech.com/api';
@@ -10,7 +11,7 @@ const VITE_API_URL = 'https://todo.nafistech.com/api';
 // Form fields
 const notificationMessage = ref('');
 const showNotification = ref(false);
-const isAuth=ref(false);
+// const isAuth=ref(false);
 const test = ref(true);
 const step = ref(1);
 const form = ref({
@@ -76,11 +77,12 @@ const handleSubmit = async () => {
       // Set Authorization header for future requests
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       showNotification.value = true;
-      notificationMessage.value = `Registration successful! Your token is: ${token}`;
-      isAuth.value=true;
+      notificationMessage.value = `Registration successful!`;
+    //   isAuth.value=true;
+      router.push('/LoginForm');
     } else {
       showNotification.value = true;
-      notificationMessage.value = "No token received.";
+      notificationMessage.value = "Registration failed.";
     }
   } catch (error) {
     submissionError.value = 'Registration failed. Please try again.';
@@ -151,7 +153,7 @@ const handleSubmit = async () => {
       </div>
     </form>
     <div class="RouteLogin">
-      Already have an account <router-link to="/LoginForm">Login in</router-link>
+      Already have an account? <router-link to="/LoginForm">Login</router-link>
     </div>
   </div>
 </template>
