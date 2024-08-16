@@ -66,43 +66,47 @@ onMounted(() => {
 <style scoped>
 /* Container background and text color */
 .container {
-  background-color: #000000; /* Black background */
-  color: #ffffff; /* White text color */
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-h2 {
-  padding-bottom: 20px;
-}
-
-/* Table styles */
-.table {
-  background-color: #000000; /* Black background for table */
-  color: #ffffff; /* White text color for table */
-}
-
-.table thead {
-  background-color: #000000; /* Black background for table header */
-}
-
-.table th, .table td {
-  border-color: #074713; /* Custom green border color */
-  background-color: #000000; /* Black background for table cells */
-  color: #ffffff; /* White text color for table cells */
-}
-
-.table tbody tr:nth-child(even) {
-  background-color: #111111; /* Slightly lighter black for even rows */
-}
-
-.table tbody tr:hover {
-  background-color: #222222; /* Dark gray highlight on row hover */
-}
-
-/* Adds text decoration for completed tasks */
-.finished {
-  text-decoration: line-through;
-  text-decoration-thickness: 4px;
-}
+    background-color: #0b0a0a; /* Black background */
+    color: #ffffff; /* White text color */
+    max-width: 1500px;
+    margin: 0 auto;
+  }
+  
+  h2 {
+    font-family: 'Times New Roman', Times, serif;
+  }
+  
+  /* Table styles */
+  .table {
+    width: 100%; /* Make the table take up the full width of the container */
+    background-color: #1a1a1a; /* Black background for table */
+    color: #ffffff; /* White text color for table */
+    border-collapse: collapse; /* Ensure borders are collapsed for a cleaner look */
+  }
+  
+  .table thead {
+    background-color: #000000; /* Black background for table header */
+  }
+  
+  .table th, .table td {
+    border: 1px solid #074713; /* Custom green border color */
+    background-color: #000000; /* Black background for table cells */
+    color: #ffffff; /* White text color for table cells */
+    padding: 10px; /* Add padding for better spacing */
+    text-align: left; /* Align text to the left */
+  }
+  
+  .table tbody tr:nth-child(even) {
+    background-color: #0c0b0b; /* Slightly lighter black for even rows */
+  }
+  
+  .table tbody tr:hover {
+    background-color: #222222; /* Dark gray highlight on row hover */
+  }
+  
+  /* Adds text decoration for completed tasks */
+  .finished {
+    text-decoration: line-through;
+    text-decoration-thickness: 4px;
+  }
 </style>

@@ -5,6 +5,7 @@ import TodoListView from '../views/TodoListView.vue';
 import AboutView from '@/views/AboutView.vue';
 import LoginForm from '@/views/LoginForm.vue';
 import RegisterView from '@/views/RegisterView.vue';
+import { isAuthenticated } from '@/auth';
 const routes = [
   {
     path: '/',
@@ -39,5 +40,14 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes
 });
+
+// router.beforeEach((to, from, next) => {
+//   if (to.meta.requiresAuth && !isAuthenticated.value) {
+//     localStorage.setItem('redirectTo', to.fullPath);
+//     next({ name: 'LoginForm' });
+//   } else {
+//     next();
+//   }
+// });
 
 export default router;

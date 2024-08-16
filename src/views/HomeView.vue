@@ -153,5 +153,11 @@ body {
   margin-bottom: 50px;
   width: 100%;
   height: 100%;
+  background-color: #0c0b0b; /* Dark background */
+  border: 2px solid #28a745; /* Green border */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 0 15px rgba(40, 167, 69, 0.5), 0 0 10px rgba(0, 0, 0, 0.7); /* Green and black shadows */
+  padding: 1em; /* Add padding inside the container */
+  color: white; /* White text */
 }
 </style>

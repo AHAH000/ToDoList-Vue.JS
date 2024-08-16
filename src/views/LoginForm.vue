@@ -4,12 +4,10 @@ import axios from 'axios';
 import Notification from '@/components/Notification.vue';
 import type { Login } from '@/api/ToDoListApi';
 import { useRouter } from 'vue-router';
-import router from '@/router';
-import HomeView from './HomeView.vue';
-const VITE_API_URL = 'https://todo.nafistech.com/api';
-// const isAuth=ref(false);
 import { isAuthenticated } from '@/auth';
+import router from '@/router';
 
+const VITE_API_URL = 'https://todo.nafistech.com/api';
 
 const emailInput = ref('');
 const passwordInput = ref('');
@@ -50,19 +48,24 @@ const submitLoginForm = async (event: Event) => {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       showNotification.value = true;
       notificationMessage.value = 'Login successful!';
-      router.push('/');
-    //   isAuth.value=true;
-    isAuthenticated.value = true;
+      isAuthenticated.value = true;
+
+      // Redirect to the previously saved route or default to home
+    //   const redirectTo = localStorage.getItem('redirectTo') || '/';
+    //   localStorage.removeItem('redirectTo');
+    //   router.push(redirectTo);
+    router.push('/');
     } else {
       showNotification.value = true;
       notificationMessage.value = 'Login failed. Check your Credentials';
     }
   } catch (error) {
     showNotification.value = true;
-    notificationMessage.value = `Login failed. Check your Credentials`;
+    notificationMessage.value = 'Login failed. Check your Credentials';
   }
 };
 </script>
+
 
 <template>
   <Notification v-if="showNotification" :message="notificationMessage" @close="showNotification = false" />
