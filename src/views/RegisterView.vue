@@ -4,7 +4,7 @@ import axios from 'axios';
 import Notification from '@/components/Notification.vue';
 import { type Register } from '../api/ToDoListApi';
 import router from '@/router';
-
+import { isAuthenticated } from '@/auth';
 // Define the API URL
 const VITE_API_URL = 'https://todo.nafistech.com/api';
 
@@ -24,6 +24,18 @@ const submissionError = ref('');
 
 // Regular expression for basic email validation
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const showAlreadyLogged = () => {
+  notificationMessage.value = 'You are already logged';
+  showNotification.value = true;
+  setTimeout(() => {
+    router.push('/');
+  }, 2000); // Wait 2 seconds to show the message before redirecting
+};
+
+if(isAuthenticated.value){
+  showAlreadyLogged()
+}
 
 // Calculate the progress percentage
 const progress = computed(() => {

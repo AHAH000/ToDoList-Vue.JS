@@ -19,6 +19,17 @@ const validateEmail = (email: string): boolean => {
   return emailRegex.test(email);
 };
 
+const showAlreadyLogged = () => {
+  notificationMessage.value = 'You are already logged';
+  showNotification.value = true;
+  setTimeout(() => {
+    router.push('/');
+  }, 2000); // Wait 2 seconds to show the message before redirecting
+};
+
+if(isAuthenticated.value){
+  showAlreadyLogged()
+}
 const submitLoginForm = async (event: Event) => {
   event.preventDefault(); // Prevent form from submitting normally
 
@@ -64,6 +75,7 @@ const submitLoginForm = async (event: Event) => {
     notificationMessage.value = 'Login failed. Check your Credentials';
   }
 };
+
 </script>
 
 
